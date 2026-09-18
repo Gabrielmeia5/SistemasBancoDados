@@ -1,4 +1,4 @@
--- Active: 1789424569760@@127.0.0.1@5432@bd_hortifruti@public
+-- Active: 1789770617030@@127.0.0.1@5432@bd_hortifruti@public
 DROP TABLE IF EXISTS itens_venda;
 CREATE TABLE itens_venda (
     id             INTEGER       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -178,5 +178,11 @@ ORDER BY categoria;
 
 
 -- Consulta 10
+SELECT
+    COUNT(venda_id);
+    
+FROM itens_venda
+WHERE bairro_entrega IS NOT NULL
+GROUP BY bairro_entrega
 
 
