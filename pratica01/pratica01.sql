@@ -1,4 +1,4 @@
--- Active: 1789770617030@@127.0.0.1@5432@bd_hortifruti@public
+-- Active: 1789771430502@@127.0.0.1@5432@bd_hortifruti@public
 DROP TABLE IF EXISTS itens_venda;
 CREATE TABLE itens_venda (
     id             INTEGER       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -135,7 +135,6 @@ FROM
 
 
 -- Consulta 6
-
 SELECT 
     venda_id AS venda, produto_id AS produto, data_venda AS data, coalesce(bairro_entrega, 'Retirada no balcão') AS destino, quantidade AS "quantidade de itens", ROUND(valor_unitario * quantidade, 2) AS valor_total
 FROM itens_venda
@@ -144,45 +143,43 @@ ORDER BY valor_total DESC;
 
 -- Consulta 7 
 SELECT
-    data_venda AS data,
-    COUNT(DISTINCT venda_id) AS vendas,
-    COUNT(*) AS itens,
-    SUM(quantidade * valor_unitario) AS faturamento
+    data_venda AS data, COUNT(DISTINCT venda_id) AS vendas, COUNT(*) AS itens, SUM(quantidade * valor_unitario) AS faturamento
 FROM itens_venda
 GROUP BY data_venda
 ORDER BY data_venda;
 
 -- Consulta 8
 SELECT
-    produto_id AS codigo,
-    produto_nome AS nome,
-    unidade,
-    SUM(quantidade) AS qtd_total,
-    SUM(quantidade * valor_unitario) AS faturamento,
-    AVG(valor_unitario) AS media_simples,
-    SUM(quantidade * valor_unitario) / SUM(quantidade) AS media_ponderada
+    produto_id AS codigo, produto_nome AS nome, unidade, SUM(quantidade) AS qtd_total, SUM(quantidade * valor_unitario) AS faturamento, AVG(valor_unitario) AS media_simples, SUM(quantidade * valor_unitario) / SUM(quantidade) AS media_ponderada
 FROM itens_venda
-GROUP BY produto_id, produto_nome, unidade
+    GROUP BY produto_id, produto_nome, unidade
 ORDER BY faturamento DESC;
 
 
 -- Consulta 9
 SELECT
-    categoria,
-    COUNT(*) AS itens,
-    SUM(quantidade) AS qtd_total,
-    SUM(quantidade * valor_unitario) AS faturamento
+    categoria, COUNT(*) AS itens, SUM(quantidade) AS qtd_total, SUM(quantidade * valor_unitario) AS faturamento
 FROM itens_venda
-GROUP BY categoria, unidade
+    GROUP BY categoria, unidade
 ORDER BY categoria;
 
 
 -- Consulta 10
 SELECT
-    COUNT(venda_id);
-    
+    bairro_entrega, COUNT(DISTINCT venda_id) AS entregas, ROUND(SUM(quantidade * valor_unitario), 2) AS faturamento
 FROM itens_venda
-WHERE bairro_entrega IS NOT NULL
+    WHERE bairro_entrega IS NOT NULL
 GROUP BY bairro_entrega
+    HAVING SUM(quantidade * valor_unitario) > 40.00
+ORDER BY faturamento DESC;
+
+
+-- Consulta 11.
+SELECT 
+    venda_id, ROUND(SUM(quantidade * valor_unitario), 2) AS total_arredondado, SUM(ROUND(quantidade * valor_unitario, 2)) AS soma_dos_itens_arredondados
+FROM itens_venda
+    GROUP BY venda_id
+--HAVING ROUND(SUM(quantidade * valor_unitario), 2) <> SUM(ROUND(quantidade * valor_unitario, 2))
+    ORDER BY venda_id ASC;
 
 
